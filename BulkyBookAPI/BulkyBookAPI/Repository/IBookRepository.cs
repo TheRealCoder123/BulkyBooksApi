@@ -10,6 +10,7 @@ namespace BulkyBookAPI.Repository
         Task<IEnumerable<BookDTO>> GetAllBooksAsync();
         Task<IEnumerable<BookDTO>> GetBooksByGenre(Guid GenreId);
         Task<IEnumerable<BookDTO>?> GetBooksByAuthor(Guid AuthorId);
+        Task<BookResponseDTO> GetBookById(Guid bookId);
         Task<IEnumerable<BookDTO>?> SearchBooks(string query);
 
 

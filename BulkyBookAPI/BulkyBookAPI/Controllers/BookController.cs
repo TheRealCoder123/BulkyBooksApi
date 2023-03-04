@@ -43,7 +43,7 @@ namespace BulkyBookAPI.Controllers
 
                 BookReponse.Success = false;
                 BookReponse.Message = "Something went wrong, check if the author or genre exist";
-                BookReponse.Status = HttpStatusCode.BadRequest.ToString();
+                BookReponse.Status = HttpStatusCode.BadRequest;
 
                 return BadRequest(BookReponse);
 
@@ -51,7 +51,7 @@ namespace BulkyBookAPI.Controllers
 
             BookReponse.Success = true;
             BookReponse.Message = "Book successfully added";
-            BookReponse.Status = HttpStatusCode.OK.ToString();
+            BookReponse.Status = HttpStatusCode.OK;
 
             return Ok(BookReponse);
         
@@ -75,7 +75,7 @@ namespace BulkyBookAPI.Controllers
 
                 BookReponse.Success = false;
                 BookReponse.Message = "Something went wrong, check if the genre exist";
-                BookReponse.Status = HttpStatusCode.BadRequest.ToString();
+                BookReponse.Status = HttpStatusCode.BadRequest;
 
                 return BadRequest(BookReponse);
 
@@ -83,7 +83,7 @@ namespace BulkyBookAPI.Controllers
 
             BookReponse.Success = true;
             BookReponse.Message = "All books in this genre";
-            BookReponse.Status = HttpStatusCode.OK.ToString();
+            BookReponse.Status = HttpStatusCode.OK;
 
             return Ok(BookReponse);
         }
@@ -106,7 +106,7 @@ namespace BulkyBookAPI.Controllers
 
                 BookReponse.Success = false;
                 BookReponse.Message = "Something went wrong, check if the author exist";
-                BookReponse.Status = HttpStatusCode.BadRequest.ToString();
+                BookReponse.Status = HttpStatusCode.BadRequest;
 
                 return BadRequest(BookReponse);
 
@@ -114,7 +114,7 @@ namespace BulkyBookAPI.Controllers
 
             BookReponse.Success = true;
             BookReponse.Message = "All books in this genre";
-            BookReponse.Status = HttpStatusCode.OK.ToString();
+            BookReponse.Status = HttpStatusCode.OK;
 
             return Ok(BookReponse);
         }
@@ -128,6 +128,25 @@ namespace BulkyBookAPI.Controllers
             var searchedBooks = await _bookRepository.SearchBooks(query);
 
             return Ok(searchedBooks);
+
+        }
+
+        [HttpGet]
+        [Route("booksBy/bookId/{book_id}")]
+        [Authorize]
+        public async Task<IActionResult> GetBookById(Guid book_id) {
+
+            var bookResponse = await _bookRepository.GetBookById(book_id);
+
+            switch (bookResponse.Status)
+            {
+                case HttpStatusCode.OK:
+                    return Ok(bookResponse);
+                case HttpStatusCode.NotFound:
+                    return NotFound(bookResponse);
+                default: return Ok(bookResponse);
+            }
+
 
         }
 

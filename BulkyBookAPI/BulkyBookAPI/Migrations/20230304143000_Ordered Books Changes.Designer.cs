@@ -4,6 +4,7 @@ using BulkyBookAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BulkyBookAPI.Migrations
 {
     [DbContext(typeof(BulkyDbContext))]
-    partial class BulkyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230304143000_Ordered Books Changes")]
+    partial class OrderedBooksChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,10 +233,15 @@ namespace BulkyBookAPI.Migrations
                     b.Property<Guid>("BookId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("BookQuantity")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("OrderedBookId");
+
+                    b.HasIndex("BookId");
 
                     b.HasIndex("OrderId");
 
@@ -347,11 +354,21 @@ namespace BulkyBookAPI.Migrations
 
             modelBuilder.Entity("BulkyBookAPI.Domain.Entities.OrderedBooks", b =>
                 {
-                    b.HasOne("BulkyBookAPI.Domain.Entities.Order", null)
+                    b.HasOne("BulkyBookAPI.Domain.Entities.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BulkyBookAPI.Domain.Entities.Order", "Order")
                         .WithMany("Books")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("BulkyBookAPI.Domain.Entities.Wishlist", b =>

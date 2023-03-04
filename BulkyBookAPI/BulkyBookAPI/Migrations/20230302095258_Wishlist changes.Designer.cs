@@ -4,6 +4,7 @@ using BulkyBookAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BulkyBookAPI.Migrations
 {
     [DbContext(typeof(BulkyDbContext))]
-    partial class BulkyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230302095258_Wishlist changes")]
+    partial class Wishlistchanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,46 +120,6 @@ namespace BulkyBookAPI.Migrations
                     b.ToTable("Book");
                 });
 
-            modelBuilder.Entity("BulkyBookAPI.Domain.Entities.CreditCards", b =>
-                {
-                    b.Property<Guid>("CardId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CardBrand")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CardExpirationDate")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CardHolderName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CardNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CardType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CardVerificationCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("CardId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("CreditCard");
-                });
-
             modelBuilder.Entity("BulkyBookAPI.Domain.Entities.Genre", b =>
                 {
                     b.Property<Guid>("GenreId")
@@ -177,68 +139,6 @@ namespace BulkyBookAPI.Migrations
                     b.HasKey("GenreId");
 
                     b.ToTable("Genre");
-                });
-
-            modelBuilder.Entity("BulkyBookAPI.Domain.Entities.Order", b =>
-                {
-                    b.Property<Guid>("OrderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("CreditCardCardId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("OrderItemsQuantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ShippingStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TotalPrice")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("OrderId");
-
-                    b.HasIndex("CreditCardCardId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Order");
-                });
-
-            modelBuilder.Entity("BulkyBookAPI.Domain.Entities.OrderedBooks", b =>
-                {
-                    b.Property<Guid>("OrderedBookId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("BookId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("OrderedBookId");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("OrderedBook");
                 });
 
             modelBuilder.Entity("BulkyBookAPI.Domain.Entities.User", b =>
@@ -286,13 +186,13 @@ namespace BulkyBookAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("BookId")
+                    b.Property<Guid>("BookId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("WishlistId");
@@ -319,59 +219,23 @@ namespace BulkyBookAPI.Migrations
                     b.Navigation("Genre");
                 });
 
-            modelBuilder.Entity("BulkyBookAPI.Domain.Entities.CreditCards", b =>
+            modelBuilder.Entity("BulkyBookAPI.Domain.Entities.Wishlist", b =>
                 {
+                    b.HasOne("BulkyBookAPI.Domain.Entities.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("BulkyBookAPI.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BulkyBookAPI.Domain.Entities.Order", b =>
-                {
-                    b.HasOne("BulkyBookAPI.Domain.Entities.CreditCards", "CreditCard")
-                        .WithMany()
-                        .HasForeignKey("CreditCardCardId");
-
-                    b.HasOne("BulkyBookAPI.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("CreditCard");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BulkyBookAPI.Domain.Entities.OrderedBooks", b =>
-                {
-                    b.HasOne("BulkyBookAPI.Domain.Entities.Order", null)
-                        .WithMany("Books")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("BulkyBookAPI.Domain.Entities.Wishlist", b =>
-                {
-                    b.HasOne("BulkyBookAPI.Domain.Entities.Book", "Book")
-                        .WithMany()
-                        .HasForeignKey("BookId");
-
-                    b.HasOne("BulkyBookAPI.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
                     b.Navigation("Book");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BulkyBookAPI.Domain.Entities.Order", b =>
-                {
-                    b.Navigation("Books");
                 });
 #pragma warning restore 612, 618
         }

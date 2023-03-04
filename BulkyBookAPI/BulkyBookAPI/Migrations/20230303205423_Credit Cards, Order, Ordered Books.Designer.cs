@@ -4,6 +4,7 @@ using BulkyBookAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BulkyBookAPI.Migrations
 {
     [DbContext(typeof(BulkyDbContext))]
-    partial class BulkyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230303205423_Credit Cards, Order, Ordered Books")]
+    partial class CreditCardsOrderOrderedBooks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,7 +150,7 @@ namespace BulkyBookAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("CardId");
@@ -235,6 +237,8 @@ namespace BulkyBookAPI.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("OrderedBookId");
+
+                    b.HasIndex("BookId");
 
                     b.HasIndex("OrderId");
 
@@ -323,9 +327,7 @@ namespace BulkyBookAPI.Migrations
                 {
                     b.HasOne("BulkyBookAPI.Domain.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -347,11 +349,21 @@ namespace BulkyBookAPI.Migrations
 
             modelBuilder.Entity("BulkyBookAPI.Domain.Entities.OrderedBooks", b =>
                 {
-                    b.HasOne("BulkyBookAPI.Domain.Entities.Order", null)
+                    b.HasOne("BulkyBookAPI.Domain.Entities.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BulkyBookAPI.Domain.Entities.Order", "Order")
                         .WithMany("Books")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("BulkyBookAPI.Domain.Entities.Wishlist", b =>

@@ -2,6 +2,7 @@
 using BulkyBookAPI.Domain.DTOs.BookDTOs;
 using BulkyBookAPI.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace BulkyBookAPI.Repository
 {
@@ -207,6 +208,51 @@ namespace BulkyBookAPI.Repository
 
             return booksDTO;
 
+        }
+
+        public async Task<BookResponseDTO?> GetBookById(Guid bookId)
+        {
+
+            var bookResponse = new BookResponseDTO();
+
+            var book = await _dbContext.Book.Include(x=>x.Author).Include(x=>x.Genre).FirstOrDefaultAsync(x => x.BookId == bookId);
+
+
+            if (book == null)
+            {
+                bookResponse.Message = "This book does not exist";
+                bookResponse.Success = false;
+                bookResponse.Status = HttpStatusCode.NotFound;
+
+                return bookResponse;
+            }
+
+
+            var bookDTO = new BookDTO
+            {
+                BookId = book.BookId,
+                Title = book.Title,
+                CreatedDate = book.CreatedDate,
+                Pages = book.Pages,
+                Price = book.Price,
+                Description = book.Description,
+                PublishedDate = book.PublishedDate,
+                Cover = book.Cover,
+                ISBN = book.ISBN,
+                Publisher = book.Publisher,
+                Quantity = book.Quantity,
+                Genre = book.Genre,
+                Author = book.Author
+            };
+
+
+
+            bookResponse.Message = "This book exist, " + book.Title;
+            bookResponse.Success = true;
+            bookResponse.Status = HttpStatusCode.OK;
+            bookResponse.Book = bookDTO;
+
+            return bookResponse;
         }
     }
 }
